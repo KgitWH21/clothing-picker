@@ -4,6 +4,7 @@ const vm=require('node:vm');
 const assert=require('node:assert/strict');
 class Element {
   constructor(){this.children=[];this.listeners={};this.classList={toggle(){}};this.hidden=true;this.value='';this.checked=false;this.attributes={};}
+  replaceChildren(...children){this.children=[...children];}
   append(...children){this.children.push(...children);}
   setAttribute(k,v){this.attributes[k]=v;}
   addEventListener(k,fn){this.listeners[k]=fn;}
@@ -19,7 +20,7 @@ function app({failStorage=false, clipboard=false, saved=null}={}){
  const context=vm.createContext({document, navigator:{clipboard:clipboard?{async writeText(t){writes.push(t);}}:undefined},localStorage:{getItem(){if(failStorage)throw Error();return stored;},setItem(k,v){if(failStorage)throw Error();stored=v;}},console});
  // Keep initial Auto structure in separates so the top-lock scenario is stable.
  vm.runInContext('Math.random = () => 0.3;',context);
- for(const file of ['data.js','weapons.js','engine.js','app.js']) vm.runInContext(readFileSync(file,'utf8'),context);
+ for(const file of ['conditions.js','data.js','weapons.js','engine.js','app.js']) vm.runInContext(readFileSync(file,'utf8'),context);
  return {elements,writes,stored:()=>stored};
 }
 (async()=>{
@@ -42,5 +43,17 @@ function app({failStorage=false, clipboard=false, saved=null}={}){
  const collectionReload=app({saved:c.stored()});assert.equal(collectionReload.elements.collection.value,'japanese');
  c.elements.collection.value='all';c.elements.collection.fire('change');assert.equal(JSON.parse(c.stored()).settings.collection,'all');
  console.log('PASS UI Japanese filter: settings event, deferred rolls, wildcard, missing-pool hints, reload, clear filter.');
+ const oldSave=JSON.parse(a.stored());delete oldSave.version;oldSave.settings.condition=false;
+ const migrated=app({saved:JSON.stringify(oldSave)});assert.equal(migrated.elements.condition.checked,true);
+ migrated.elements.condition.checked=false;migrated.elements.condition.fire('change');assert.equal(app({saved:migrated.stored()}).elements.condition.checked,false);
+ const e=app();assert.equal(e.elements.condition.checked,true);assert.ok(JSON.parse(e.stored()).results.top.condition);const conditionSelect=e.elements.slots.children[3].children[1].children[1].children[0];
+ assert.equal(conditionSelect.disabled,false);const garment=JSON.parse(e.stored()).results.top;
+ conditionSelect.value='brand_new';conditionSelect.fire('change');
+ assert.equal(JSON.parse(e.stored()).results.top.condition,'brand_new');assert.equal(JSON.parse(e.stored()).results.top.id,garment.id);
+ const eLock=e.elements.slots.children[3].children[3].children[1];eLock.fire('click');assert.equal(conditionSelect.disabled,true);
+ const eReload=app({saved:e.stored()});assert.equal(eReload.elements.slots.children[3].children[1].children[1].children[0].value,'brand_new');
+ eLock.fire('click');conditionSelect.value='';conditionSelect.fire('change');assert.equal(JSON.parse(e.stored()).results.top.condition,null);
+ e.elements.condition.checked=true;e.elements.condition.fire('change');e.elements.roll.fire('click');assert.ok(JSON.parse(e.stored()).results.top.condition);
+ console.log('PASS UI conditions: per-item edit, stable garment, locks, reload, clear, optional random wear.');
  console.log('PASS UI event wiring: initial results, clipboard success/fallback, locks, reload, weapons, unlock all, storage failure.');
 })().catch(e=>{console.error(e);process.exitCode=1;});

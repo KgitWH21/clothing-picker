@@ -18,6 +18,18 @@
       row.lock.disabled=!!result?.covered||!!result?.reserved||!result;
       row.reroll.disabled=!!state.locks[id]||!!result?.covered||!!result?.reserved;
       row.input.value=state.chances[id];
+      if(row.conditionSelect) {
+        const select=row.conditionSelect;
+        select.replaceChildren();
+        const option=(value,label)=>{const el=document.createElement('option');el.value=value;el.textContent=label;select.append(el);return el;};
+        option('','No condition');
+        const options=P.conditionOptions(result);
+        for(const c of options) option(c.id,c.label);
+        const legacy=result&&!result.empty&&!result.baseText&&/^(faded|freshly pressed|well-kept|mended|frayed|worn|polished|scuffed) /i.test(result.text);
+        if(legacy) option('legacy','Saved description').disabled=true;
+        select.value=legacy?'legacy':result?.condition||'';
+        select.disabled=!!state.locks[id]||!options.length;
+      }
       row.availability.textContent=state.settings.collection==='japanese'&&id!=='hairstyle'&&id!=='weapon'&&!P.pool(id,state.settings).length?'No Japanese choices for these filters.':'';
     }
     $('weaponControls').hidden=!state.settings.weapons;
@@ -34,6 +46,17 @@
     const title=document.createElement('div');title.className='slot-title';title.textContent=label;
     const availability=document.createElement('span');availability.className='slot-availability';title.append(availability);
     const result=document.createElement('div');result.className='result';result.id='result-'+id;
+    const details=document.createElement('div');details.className='slot-details';details.append(result);
+    let conditionSelect=null;
+    if(id!=='hairstyle'&&id!=='weapon') {
+      const conditionLabel=document.createElement('label');conditionLabel.className='item-condition';conditionLabel.textContent='Condition';
+      conditionSelect=document.createElement('select');conditionSelect.setAttribute('aria-label',label+' condition');
+      conditionSelect.addEventListener('change',()=>{
+        const outcome=P.setCondition(state,id,conditionSelect.value||null);state=outcome.state;render();
+        notify(outcome.error||(label+' condition updated.'),!!outcome.error);
+      });
+      conditionLabel.append(conditionSelect);details.append(conditionLabel);
+    }
     const chance=document.createElement('label');chance.className='chance';
     const caption=document.createElement('span');caption.className='chance-label';caption.textContent=id==='hairstyle'?'Unspecified':'None';
     const input=document.createElement('input');input.type='number';input.min='0';input.max='100';input.step='1';input.setAttribute('aria-label',label+': chance of '+(id==='hairstyle'?'Unspecified':'None')+' (%)');
@@ -42,7 +65,7 @@
     const actions=document.createElement('div');actions.className='actions';
     const reroll=document.createElement('button');reroll.textContent='Reroll';reroll.setAttribute('aria-label','Reroll '+label);reroll.setAttribute('aria-controls',result.id);reroll.addEventListener('click',()=>roll(id));
     const lock=document.createElement('button');lock.setAttribute('aria-label','Lock '+label);lock.addEventListener('click',()=>{state.locks[id]=!state.locks[id];render();notify(label+(state.locks[id]?' locked.':' unlocked.'));});
-    actions.append(reroll,lock);row.append(title,result,chance,actions);$(id==='weapon'?'weaponSlot':'slots').append(row);rows[id]={result,input,reroll,lock,availability};
+    actions.append(reroll,lock);row.append(title,details,chance,actions);$(id==='weapon'?'weaponSlot':'slots').append(row);rows[id]={result,input,reroll,lock,availability,conditionSelect};
   }
   for(const [id,value] of Object.entries(state.settings)) {
     const el=$(id);if(typeof value==='boolean') el.checked=value;else el.value=value;

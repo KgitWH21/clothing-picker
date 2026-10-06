@@ -321,8 +321,11 @@
   add('bottom','fantasy','shared','Drawstring linen breeches|Button-fall breeches|Knee-buckled breeches|Venetian breeches|Trunk hose|Pumpkin breeches|Panes-and-puffs breeches|Pluderhose|Joined wool hose|Footed wool chausses|Laced leather chausses|Padded riding breeches|Quilted winter breeches|Fur-lined hunting trousers|Gusseted mercenary trousers|Tie-calf ranger trousers|High-waisted sailor slops|Canvas deck breeches|Split-front court trousers|Wide-legged caravan trousers|Wrapped desert trousers|Layered nomad skirt|Pleated traveling kilt|Laced riding culottes|Chainmail chausses over padded trousers|Leather trousers with riveted thigh plates|Lamellar-armored riding trousers|Quilted trousers with steel knee guards');
   add('bottom','fantasy','f n','Linen peasant skirt|Gathered wool overskirt with underskirt|Gored court skirt|Split-front overskirt with full underskirt|Paneled brocade court skirt|Bustled traveling skirt|Laced-waist riding skirt|Layered handkerchief skirt|Scalloped heraldic skirt|Split-panel ranger skirt over leggings');
 
+  // Conditions are metadata on each item, independent of its garment name.
+  const conditionData = root.ConditionData || require('./conditions.js');
+  for (const item of items) Object.assign(item, conditionData.classify(item));
+
   const colors = ['black','charcoal','navy','cream','brown','burgundy','forest-green','slate-blue','rust','ivory'];
-  const conditions = {fabric:['faded','freshly pressed','well-kept','mended','frayed'], general:['well-kept','worn'], hard:['polished','well-kept'], leather:['scuffed','well-kept','worn','polished']};
-  const api = {items, colors, conditions}; root.WardrobeData = api;
+  const api = {items, colors, conditions: conditionData.catalog}; root.WardrobeData = api;
   if (typeof module !== 'undefined') module.exports = api;
 })(typeof globalThis !== 'undefined' ? globalThis : window);

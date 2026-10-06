@@ -1,6 +1,6 @@
 <!doctype html>
 <html lang="en">
-<head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>Character Wardrobe Picker</title><link rel="stylesheet" href="style.css"><script defer src="data.js"></script><script defer src="weapons.js"></script><script defer src="engine.js"></script><script defer src="app.js"></script></head>
+<head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>Character Wardrobe Picker</title><link rel="stylesheet" href="style.css"><script defer src="conditions.js"></script><script defer src="data.js"></script><script defer src="weapons.js"></script><script defer src="engine.js"></script><script defer src="app.js"></script></head>
 <body>
 <main>
 <header><h1>Character Wardrobe Picker</h1></header>
@@ -12,7 +12,8 @@
 <label>Picking mode<select id="mode"><option value="coordinated">Coordinated</option><option value="wildcard">Wildcard</option></select></label>
 <label>Outfit structure<select id="structure"><option value="auto">Auto</option><option value="separates">Separates</option><option value="onepiece">One-piece</option></select></label>
 </div>
-<div class="settings-line"><label class="probability">Auto one-piece chance <input id="onepieceChance" type="number" min="0" max="100" step="1"> %</label><label><input id="color" type="checkbox"> Color</label><label><input id="condition" type="checkbox"> Condition / wear</label></div>
+<div class="settings-line"><label class="probability">Auto one-piece chance <input id="onepieceChance" type="number" min="0" max="100" step="1"> %</label><label><input id="color" type="checkbox"> Color</label><label><input id="condition" type="checkbox"> Random condition on rolls</label></div>
+<p class="hint">Each item has a Condition menu. Choose a condition without changing the item or color; unlock it first if locked. Random conditions start on for future rolls; uncheck the option to turn them off.</p>
 <p class="hint" id="collectionHelp">Collection filters clothing and accessories, including in Wildcard. Hairstyles and Weapons keep their own filters.</p>
 <p class="hint" id="modeHelp">Coordinated draws from one occasion; it doesn’t guarantee a perfectly styled outfit.</p>
 <p class="hint">A one-piece replaces Top and Bottom; a one-piece None roll falls back to separates. Covered slots cannot be locked or rerolled.</p>

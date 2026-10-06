@@ -1,8 +1,9 @@
 (function(root) {
   const D = root.WardrobeData || require('./data.js');
+  const C = root.ConditionData || require('./conditions.js');
   const W = root.WeaponData || require('./weapons.js');
   const slots = [ ['hairstyle','Hairstyle',0], ['headwear','Headwear',65], ['facewear','Facewear',65], ['top','Top',0], ['bottom','Bottom',0], ['onepiece','One-piece garment',0], ['outerwear','Outerwear',50], ['ears','Ear jewelry',70], ['neck','Neck jewelry',65], ['hands','Wrist / hand jewelry',60], ['gloves','Gloves / handwear',75], ['waist','Waist accessories',55], ['carried','Carried accessories',50], ['footwear','Footwear',0], ['weapon','Weapon / advantage',70] ];
-  function initial() {return {settings:{collection:'all',occasion:'casual',presentation:'any',mode:'coordinated',structure:'auto',onepieceChance:25,color:false,condition:false,omitEmpty:true,weapons:false,weaponMode:'physical',era:'any'}, results:{}, locks:{}, chances:Object.fromEntries(slots.map(([id,,p])=>[id,p])), structure:'separates'};}
+  function initial() {return {version:2,settings:{collection:'all',occasion:'casual',presentation:'any',mode:'coordinated',structure:'auto',onepieceChance:25,color:false,condition:true,omitEmpty:true,weapons:false,weaponMode:'physical',era:'any'}, results:{}, locks:{}, chances:Object.fromEntries(slots.map(([id,,p])=>[id,p])), structure:'separates'};}
   const empty = slot => ({text:slot==='hairstyle'?'Unspecified':'None',empty:true,conflictSlots:[]});
   const covered = () => ({text:'Covered by one-piece',empty:true,covered:true});
   const choose = (pool, rng) => pool[Math.min(pool.length-1,Math.floor(rng()*pool.length))];
@@ -14,12 +15,28 @@
     if(item.kind) return item.name+(item.advantage?' — '+item.advantage:'');
     if(item.slot==='hairstyle') return item.name;
     const hard = item.material==='hard'||['ears','neck','hands'].includes(item.slot)||/spectacles|glasses|goggles|armor|cuirass|brigandine|gauntlet|helm|sabatons|greaves/i.test(item.name);
-    const leather = /leather|boots|loafers|brogues|derby|oxford shoes|pumps/i.test(item.name);
     const modifiers=[];
-    const fabric = item.material!=='general'&&['top','bottom','onepiece','outerwear','headwear','gloves'].includes(item.slot);
-    if(settings.condition) modifiers.push(choose(hard?D.conditions.hard:leather?D.conditions.leather:fabric?D.conditions.fabric:D.conditions.general,rng));
+
     if(settings.color&&!hard&&!/white|black|ivory|brown/i.test(item.name)) modifiers.push(choose(D.colors,rng));
     return modifiers.length ? modifiers.join(' ')+' '+item.name.charAt(0).toLowerCase()+item.name.slice(1) : item.name;
+  }
+  function conditionText(baseText, id) {
+    const condition=C.catalog.find(c=>c.id===id);
+    return baseText+(condition?' — '+condition.label.toLowerCase():'');
+  }
+  function conditionOptions(result) {return result&&!result.empty?C.options(D.items.find(i=>i.id===result.id)):[];}
+  function setCondition(current, slot, id) {
+    const result=current.results[slot];
+    if(current.locks[slot]) return {state:current,error:'Unlock this item before changing its condition.'};
+    if(!result||result.empty||!conditionOptions(result).length) return {state:current,error:'This slot has no clothing item to condition.'};
+    if(id!==null&&!conditionOptions(result).some(c=>c.id===id)) return {state:current,error:'That condition does not fit this item.'};
+    const state=JSON.parse(JSON.stringify(current));
+    const r=state.results[slot];
+    // Old saved results had only a rendered text. Remove their known wear prefix
+    // only when the user explicitly edits the condition; preserve their color.
+    r.baseText=r.baseText||r.text.replace(/^(faded|freshly pressed|well-kept|mended|frayed|worn|polished|scuffed) /i,'');
+    r.condition=id;r.text=conditionText(r.baseText,id);
+    return {state,error:''};
   }
   function pick(slot,state,rng) {
     if(state.chances[slot]>=100 || (state.chances[slot]>0 && rng()<state.chances[slot]/100)) return empty(slot);
@@ -27,7 +44,10 @@
     if(slot==='weapon') options=options.filter(i=>i.conflictSlots.every(s=>!state.locks[s] || state.results[s]?.empty));
     if(!options.length) return {...empty(slot),text:state.settings.collection==='japanese'&&slot!=='weapon'&&slot!=='hairstyle'?'No Japanese options for these filters':'No matching options',reason:true};
     const item=choose(options,rng);
-    return {id:item.id,text:describe(item,state.settings,rng),empty:false,conflictSlots:item.conflictSlots||[]};
+    const baseText=describe(item,state.settings,rng);
+    const conditions=C.options(item);
+    const condition=state.settings.condition&&conditions.length?choose(conditions,rng).id:null;
+    return {id:item.id,baseText,condition,text:conditionText(baseText,condition),empty:false,conflictSlots:item.conflictSlots||[]};
   }
   function roll(current, target=null, rng=Math.random) {
     const state=JSON.parse(JSON.stringify(current)), s=state.settings;
@@ -79,6 +99,8 @@
         const v=saved.settings?.[key];
         if(enums[key]?enums[key].includes(v):typeof base.settings[key]==='boolean'?typeof v==='boolean':Number.isFinite(v)&&v>=0&&v<=100) base.settings[key]=v;
       }
+      // Enable the requested default once for older saves; later opt-outs persist.
+      if(saved.version!==2) base.settings.condition=true;
       for(const [id] of slots) {
         if(Number.isFinite(saved.chances?.[id])) base.chances[id]=Math.min(100,Math.max(0,saved.chances[id]));
         const r=saved.results?.[id];
@@ -89,5 +111,5 @@
       if(base.structure==='onepiece') {base.results.top=covered();base.results.bottom=covered();base.locks.top=false;base.locks.bottom=false;}
     } catch (_) {} return base;
   }
-  const api={slots,initial,pool,pick,roll,copyText,restore}; root.Picker=api; if(typeof module!=='undefined') module.exports=api;
+  const api={conditionOptions,setCondition,slots,initial,pool,pick,roll,copyText,restore}; root.Picker=api; if(typeof module!=='undefined') module.exports=api;
 })(globalThis);
