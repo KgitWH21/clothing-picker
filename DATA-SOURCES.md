@@ -30,3 +30,15 @@ The list includes both named traditional garments and clearly labeled modern/reg
 - **Romanian-Moldovan shoulder-panel embroidery:** regional blouse vocabulary. [Moldova's intangible heritage inventory](https://www.patrimoniuimaterial.md/en/node/310).
 
 The references support terminology and garment boundaries. Individual material variants, modern silhouettes, fantasy designs, and picker tag choices are authored for this app rather than reproduced from museum catalogs.
+
+## Bottoms expansion
+
+The Bottom slot contains lower-body separates. Layered skirt/underskirt descriptions are a single lower-body result; complete dresses and two-piece outfits are excluded. Appearance and occasion tags are editorial choices, with broadly shared trousers, skirts, and shorts available across presentations.
+
+- **Hakama and monpe:** the collection keeps divided hakama and adds an undivided skirt form, monpe work trousers, and explicitly labeled modern/fantasy adaptations. [The Met's hakama record](https://www.metmuseum.org/art/collection/search/44633) documents a trouser form; [Nippon.com's hakama guide](https://www.nippon.com/en/guide-to-japan/cs00071/) provides context; [Japan Objects' pants collection](https://shop.japanobjects.com/collections/mens-pants) includes monpe. Modern workwear-inspired pieces do not claim to be historical costume.
+- **Salwar:** lower-body trousers, rather than the complete salwar-kameez ensemble. [Smithsonian salwars entry](https://americanhistory.si.edu/collections/object/nmah_1761681).
+- **Baji and chima:** Korean trousers and skirt respectively, rather than a full hanbok. [Visit Seoul's hanbok guide](https://english.visitseoul.net/tours/The-Hanbok-EN_/11852).
+- **Mamianqun:** a pleated Chinese skirt. [British Museum garment record](https://www.britishmuseum.org/collection/object/A_2022-3030-5).
+- **Sarong:** wrapped lower-garment vocabulary. [Smithsonian sarong record](https://www.si.edu/object/sarong%3Achndm_1969-50-2).
+
+Every occasion has Japanese-tagged bottom choices for each presentation. The filter continues to exclude untagged garments even if similar items could also be worn in Japan. Coordinated mode still matches occasion, not a specific historical period, sporting uniform, or cultural ensemble.

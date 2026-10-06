@@ -142,7 +142,7 @@ test('expanded tops retain broad filter coverage and named international separat
 test('Japanese collection intersects occasion and gender in coordinated and wildcard modes',()=>{
  const base={...P.initial().settings,collection:'japanese'};
  const tagged=D.items.filter(i=>i.collections.includes('japanese'));
- assert.equal(tagged.length,34);assert.equal(tagged.filter(i=>i.slot==='top').length,24);
+ assert.ok(tagged.length>=51);assert.equal(tagged.filter(i=>i.slot==='top').length,24);
  for(const mode of ['coordinated','wildcard']) for(const occasion of ['casual','work','formal','outdoor','active','sleep','fantasy']) for(const presentation of ['m','f','n','any']) {
    const settings={...base,mode,occasion,presentation};
    for(const [slot] of P.slots.filter(([id])=>!['hairstyle','weapon'].includes(id))) {
@@ -177,5 +177,29 @@ test('Japanese collection restores safely and old saves default to all collectio
  const saved=P.restore(JSON.stringify(s));assert.equal(saved.settings.collection,'japanese');assert.equal(saved.locks.top,true);assert.deepEqual(saved.results,s.results);
  delete s.settings.collection;assert.equal(P.restore(JSON.stringify(s)).settings.collection,'all');
  s.settings.collection='unknown';assert.equal(P.restore(JSON.stringify(s)).settings.collection,'all');
+});
+test('expanded bottoms cover all occasions and Japanese selections without outfit-slot leakage',()=>{
+ const bottoms=D.items.filter(i=>i.slot==='bottom');
+ assert.ok(bottoms.length>=500);
+ assert.equal(new Set(bottoms.map(i=>i.name.toLowerCase())).size,bottoms.length);
+ const occasions=['casual','work','formal','outdoor','active','sleep','fantasy'];
+ for(const item of bottoms){
+   assert.ok(item.occasions.every(o=>occasions.includes(o)));
+   assert.ok(item.presentations.every(p=>['m','f','n','shared'].includes(p)));
+   assert.ok(!/\b(dress|jumpsuit|overalls|coveralls|wetsuit|singlet)\b/i.test(item.name.replace('dress trousers','trousers').replace('dress slacks','slacks')));
+ }
+ for(const occasion of occasions) for(const presentation of ['m','f','n','any']){
+   const s=P.initial();Object.assign(s.settings,{occasion,presentation,structure:'separates'});
+   assert.ok(P.pool('bottom',s.settings).length>=25,`${occasion}/${presentation}`);
+   s.settings.collection='japanese';assert.ok(P.pool('bottom',s.settings).length>0,`Japanese ${occasion}/${presentation}`);
+   const result=P.roll(s,'bottom',fixed).state.results.bottom;
+   assert.equal(result.empty,false);assert.ok(D.items.find(i=>i.id===result.id).collections.includes('japanese'));
+ }
+ const examples={casual:'Barrel-leg jeans',work:'Chef’s checked trousers',formal:'Taffeta ball skirt',outdoor:'Stretch trekking trousers',active:'Board shorts',sleep:'Cotton poplin pajama trousers',fantasy:'Venetian breeches'};
+ for(const [occasion,name] of Object.entries(examples)) assert.ok(P.pool('bottom',{...P.initial().settings,occasion}).some(i=>i.name===name));
+ const settings={...P.initial().settings,collection:'japanese',mode:'wildcard'};
+ assert.equal(P.pool('bottom',settings).length,20);
+ assert.ok(!P.pool('bottom',settings).some(i=>i.name.startsWith('Salwar')));
+ assert.equal(P.pool('bottom',{...settings,collection:'all'}).length,bottoms.length);
 });
 console.log(`${checks} behavior checks passed.`);

@@ -1,6 +1,6 @@
 # Character Wardrobe Picker
 
-A local, text-only writing tool with 1,442 distinct base details, including 316 hairstyles, 332 headwear entries, and 479 tops, plus 47 physical weapons / social advantages. No dependencies, build step, network requests, or accounts.
+A local, text-only writing tool with 1,898 distinct base details, including 316 hairstyles, 332 headwear entries, 479 tops, and 523 bottoms, plus 47 physical weapons / social advantages. No dependencies, build step, network requests, or accounts.
 
 ## Open it
 
@@ -10,7 +10,7 @@ Browser storage remembers results, locks, and settings when available. File-URL 
 
 ## Use it
 
-Choose **Clothing collection → Japanese only** to limit future clothing/accessory draws to the 34 explicitly tagged Japanese or Japanese-inspired entries. The collection includes 24 tops and 10 complementary bottoms, robes, jackets, and footwear items. Occasion and gender still apply, including in Wildcard; choosing Any / mixed removes only the gender filter. Hairstyles and Weapons keep their independent pools. Accessories and setting combinations without tagged entries show a clear availability note and never substitute unrelated clothing. Locked results keep their earlier selections: use Unlock all, then Roll outfit for a fully refreshed selection. The collection setting is saved locally; older saved outfits default to All collections.
+Choose **Clothing collection → Japanese only** to limit future clothing/accessory draws to the 51 explicitly tagged Japanese or Japanese-inspired entries. The collection includes 24 tops, 20 bottoms, and 7 robes, jackets, and footwear items. Occasion and gender still apply, including in Wildcard; choosing Any / mixed removes only the gender filter. Hairstyles and Weapons keep their independent pools. Accessories and setting combinations without tagged entries show a clear availability note and never substitute unrelated clothing. Locked results keep their earlier selections: use Unlock all, then Roll outfit for a fully refreshed selection. The collection setting is saved locally; older saved outfits default to All collections.
 
 Choose an occasion, presentation, picking mode, and outfit structure, then **Roll outfit**. Coordinated matches occasion, without guaranteeing perfect styling. Wildcard draws each slot across occasions while retaining the presentation filter. Hairstyles use presentation tags: shared styles appear for every gender option; masculine-associated styles use `m n`, and feminine-associated styles use `f n`. Neutral and Any / mixed include the full hairstyle catalog. These tags guide a writing prompt, rather than define who can wear a hairstyle. All hairstyles remain available across occasions.
 
@@ -23,6 +23,8 @@ Color and condition are independent, initially off, and never decorate hairstyle
 Weapons are disabled by default with a 70% None chance. Their mode and era operate independently of clothing settings, even in Wildcard. Wearable/carried weapon objects reserve relevant wardrobe slots to avoid conflicting duplicates. A new weapon draw excludes objects that conflict with nonempty locked wardrobe slots. Disabling Weapons retains its result and lock for later, removes it from copied text, and releases its reserved slots to None; reroll those slots as desired. Re-enabling a saved conflicting weapon asks you to unlock the named wardrobe slot first.
 
 ## Expand the data
+
+Bottoms cover all seven occasions: everyday trousers/jeans/skirts/shorts, professional tailoring and uniforms, formal separates, outdoor gear, sports/swim bottoms, sleep/lounge separates, and historical/fantasy pieces. International names identify the lower component only; Japanese-inspired adaptations are explicitly labeled and tagged for the Japanese collection. No full suits, dresses, or bib overalls are added to Bottom.
 
 The tops collection includes Japanese separates and contemporary styles, plus international shirts, tunics, and blouses. Named garments have brief English descriptions; modern adaptations are marked as such. Two-piece sets contribute only their top component. Full-length robes and overcoats are not entered as tops. Regional names do not impose ethnicity restrictions. See [DATA-SOURCES.md](DATA-SOURCES.md) for terminology references and classification notes. Coordinated mode matches occasion, not cultural tradition or historical period.
 
