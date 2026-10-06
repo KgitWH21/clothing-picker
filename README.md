@@ -1,0 +1,66 @@
+# Character Wardrobe Picker
+
+A local, text-only writing tool with 1,442 distinct base details, including 316 hairstyles, 332 headwear entries, and 479 tops, plus 47 physical weapons / social advantages. No dependencies, build step, network requests, or accounts.
+
+## Open it
+
+Open `index.html` in a modern web browser. Everything runs locally. Alternatively, run `python3 -m http.server 8000` in this folder and visit `http://localhost:8000`.
+
+Browser storage remembers results, locks, and settings when available. File-URL storage support varies by browser. If storage is unavailable, the app works for the current session. Clipboard access may also be unavailable when opening a file directly; Copy outfit then shows selected plain text for manual copying.
+
+## Use it
+
+Choose **Clothing collection → Japanese only** to limit future clothing/accessory draws to the 34 explicitly tagged Japanese or Japanese-inspired entries. The collection includes 24 tops and 10 complementary bottoms, robes, jackets, and footwear items. Occasion and gender still apply, including in Wildcard; choosing Any / mixed removes only the gender filter. Hairstyles and Weapons keep their independent pools. Accessories and setting combinations without tagged entries show a clear availability note and never substitute unrelated clothing. Locked results keep their earlier selections: use Unlock all, then Roll outfit for a fully refreshed selection. The collection setting is saved locally; older saved outfits default to All collections.
+
+Choose an occasion, presentation, picking mode, and outfit structure, then **Roll outfit**. Coordinated matches occasion, without guaranteeing perfect styling. Wildcard draws each slot across occasions while retaining the presentation filter. Hairstyles use presentation tags: shared styles appear for every gender option; masculine-associated styles use `m n`, and feminine-associated styles use `f n`. Neutral and Any / mixed include the full hairstyle catalog. These tags guide a writing prompt, rather than define who can wear a hairstyle. All hairstyles remain available across occasions.
+
+Each slot has a reroll, a lock, and an empty probability. `0%` always picks a matching item; `100%` always picks None (Unspecified for hair). Bald and shaved heads are deliberate choices. Locks preserve the exact text, including its descriptors, even after filters change. Individual top/bottom rerolls keep the existing separates structure.
+
+Auto has a separate one-piece selection chance, initially 25%. A selected one-piece replaces top and bottom; its own None chance still applies. If that roll is None, the picker generates separates, even with One-piece requested. Covered slots cannot be locked or individually rerolled. A locked nonempty one-piece forces one-piece structure; a locked top, bottom, or empty one-piece forces separates. Explicit conflicting requests explain what to unlock and leave results unchanged. Unlock, then roll again to apply the new structure.
+
+Color and condition are independent, initially off, and never decorate hairstyles. Some rigid accessories omit color to keep descriptions sensible. Copy outfit produces labeled plain text; empty, covered, and reserved slots are omitted when Omit empty slots is enabled.
+
+Weapons are disabled by default with a 70% None chance. Their mode and era operate independently of clothing settings, even in Wildcard. Wearable/carried weapon objects reserve relevant wardrobe slots to avoid conflicting duplicates. A new weapon draw excludes objects that conflict with nonempty locked wardrobe slots. Disabling Weapons retains its result and lock for later, removes it from copied text, and releases its reserved slots to None; reroll those slots as desired. Re-enabling a saved conflicting weapon asks you to unlock the named wardrobe slot first.
+
+## Expand the data
+
+The tops collection includes Japanese separates and contemporary styles, plus international shirts, tunics, and blouses. Named garments have brief English descriptions; modern adaptations are marked as such. Two-piece sets contribute only their top component. Full-length robes and overcoats are not entered as tops. Regional names do not impose ethnicity restrictions. See [DATA-SOURCES.md](DATA-SOURCES.md) for terminology references and classification notes. Coordinated mode matches occasion, not cultural tradition or historical period.
+
+Headwear spans everyday hats, cultural and religious coverings, professional uniforms, safety and sports equipment, sleep caps, historical designs, and fantasy regalia. Shared entries match every gender option; `m n` and `f n` entries also match Neutral. Occasion tags keep specialist pieces in relevant pools; Wildcard opens all occasions. These are broad writing prompts, not a claim that a hairstyle or hat can only be worn by one gender.
+
+- `data.js`: clothing, hairstyles, accessories, colors, and conditions.
+- `weapons.js`: separate physical and metaphorical lists.
+- `engine.js`: filtering, random selection, structure, locks, serialization, and copying.
+- `app.js`: interface events, clipboard fallback, and browser storage.
+- `style.css`: responsive dark theme.
+
+In `data.js`, add a call before the exported `api`, for example:
+
+```js
+add('top', 'casual work', 'shared', 'Embroidered linen blouse|Pleated popover shirt');
+```
+
+Names separated by `|` become distinct base entries. Don't duplicate garments just to add colors. Slots are listed in `engine.js`. Occasion tags are `casual work formal outdoor active sleep fantasy`; use `all` for universal items. Presentation tags are `m f n` or `shared` (matches all presentations). Multiple tags use spaces. The optional fifth `add` argument can be `hard` for rigid ornaments or `general` for non-fabric items such as straw hats and wreaths; these avoid fabric-only wear phrases. The optional sixth argument adds space-separated collection tags, for example `add('top', 'casual', 'shared', 'New Japanese-inspired shirt', '', 'japanese')`. Use explicit collection tags; names are never searched to decide inclusion. Add new colors or wear phrases to the separate descriptor lists. Rendered descriptions are stored so expanding lists doesn't rewrite an existing outfit.
+
+In `weapons.js`, add entries before the exported `api`:
+
+```js
+add(physical, 'historical fantasy', 'Ceremonial polearm');
+add(metaphorical, 'contemporary historical fantasy sci-fi',
+    'Trusted witness', 'can corroborate a disputed account');
+```
+
+Era tags are `contemporary historical fantasy sci-fi`. For an ordinary wearable/carried object, provide conflict slots as the fifth argument, such as `['carried']` or `['hands']`. This reserves the entire slot conservatively. Intangible advantages should have no conflict slots. Descriptions concern appearance and narrative advantage, not weapon operation.
+
+## Verification
+
+With Node.js installed:
+
+```sh
+node test.js
+node test-ui.js
+```
+
+Engine checks cover the collection, every occasion/presentation/slot combination, wildcard filtering, 0%/100% probabilities, locks, one-piece transitions and conflicts, descriptors, weapon eras/reservations, plain-text copy, and saved-state restoration. The UI harness checks event wiring, clipboard success/fallback, reload persistence, storage failure, weapon enablement, and unlocking.
+
+The UI harness is not a browser: desktop/mobile visual rendering, real browser clipboard permissions, and keyboard/screen-reader interaction have not been manually verified in this environment. The layout includes phone breakpoints, native labeled form controls, visible focus styles, and live status messages.
