@@ -4,6 +4,7 @@
   let state=P.initial(), storage=true;
   try {state=P.restore(localStorage.getItem(key));} catch (_) {storage=false;}
   if(!Object.keys(state.results).length) state=P.roll(state).state;
+  else state=P.fillFoundation(state);
   const rows={};
   function notify(message,error=false) {$('status').textContent=message;$('status').classList.toggle('error',error);}
   function save() {
@@ -25,7 +26,7 @@
         option('','No condition');
         const options=P.conditionOptions(result);
         for(const c of options) option(c.id,c.label);
-        const legacy=result&&!result.empty&&!result.baseText&&/^(faded|freshly pressed|well-kept|mended|frayed|worn|polished|scuffed) /i.test(result.text);
+        const legacy=id!=='weapon'&&result&&!result.empty&&!result.baseText&&/^(faded|freshly pressed|well-kept|mended|frayed|worn|polished|scuffed) /i.test(result.text);
         if(legacy) option('legacy','Saved description').disabled=true;
         select.value=legacy?'legacy':result?.condition||'';
         select.disabled=!!state.locks[id]||!options.length;
@@ -35,8 +36,6 @@
     $('weaponControls').hidden=!state.settings.weapons;
     $('onepieceChance').disabled=state.settings.structure!=='auto';
     $('structureBadge').textContent=state.structure==='onepiece'?'ONE-PIECE OUTFIT':'SEPARATES';
-    $('modeHelp').textContent=state.settings.mode==='coordinated'?'Coordinated draws from one occasion; it doesn’t guarantee a perfectly styled outfit.':'Wildcard draws each slot from all occasions. Collection and gender filters still apply; Any / mixed removes only the gender filter.';
-    $('collectionHelp').textContent=state.settings.collection==='japanese'?'Japanese only: traditional and clearly labeled Japanese-inspired clothing and accessories. Empty pools never fall back to other collections. Hairstyles and Weapons keep their own filters.':'Collection filters clothing and accessories, including in Wildcard. Hairstyles and Weapons keep their own filters.';
     if(!$('copyFallback').hidden) $('copyText').value=P.copyText(state);
     save();
   }
@@ -48,7 +47,7 @@
     const result=document.createElement('div');result.className='result';result.id='result-'+id;
     const details=document.createElement('div');details.className='slot-details';details.append(result);
     let conditionSelect=null;
-    if(id!=='hairstyle'&&id!=='weapon') {
+    if(id!=='hairstyle') {
       const conditionLabel=document.createElement('label');conditionLabel.className='item-condition';conditionLabel.textContent='Condition';
       conditionSelect=document.createElement('select');conditionSelect.setAttribute('aria-label',label+' condition');
       conditionSelect.addEventListener('change',()=>{

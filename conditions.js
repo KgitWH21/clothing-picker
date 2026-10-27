@@ -55,6 +55,7 @@
   function classify(item) {
     if(item.slot==='hairstyle'||item.kind) return {conditionProfile:null,conditionFeatures:[]};
     const n=item.name.toLowerCase(), slot=item.slot;
+    const foundation=['undergarmentTop','undergarmentBottom','hosiery'].includes(slot);
     let profile='fabric';
     if(/rubber|neoprene|wetsuit|rain boots/.test(n)) profile='rubber';
     else if(/leather|suede|shearling/.test(n)) profile='leather';
@@ -71,14 +72,25 @@
     if(profile==='fabric'&&/knit|jersey|sweater|pullover|cardigan|fleece|sweatshirt|hoodie|sock/.test(n)) f.add('knit');
     if(profile==='fabric'&&/stretch|jersey|leggings|tights|compression|ribbed|swim|sports bra/.test(n)) f.add('stretch');
     if(/wool|cashmere|merino|tweed|aran|guernsey|lopapeysa/.test(n)) f.add('wool');
-    if(soft&&['top','bottom','onepiece','headwear','facewear','gloves','footwear'].includes(slot)) f.add('body_contact');
+    if(soft&&(foundation||['top','bottom','onepiece','headwear','facewear','gloves','footwear'].includes(slot))) f.add('body_contact');
     const sleeveless=/sleeveless|strapless|bandeau|tube top|tank|cami|halter|shell|bodice|bustier|corset|bra\b|vest|waistcoat|cape|poncho|shawl|tabard|pinafore|dungarees|overalls|bib |one-shoulder|off-shoulder/.test(n);
-    if(profile==='fabric'&&['top','onepiece','outerwear'].includes(slot)&&!sleeveless&&/shirt|blouse|sweater|pullover|hoodie|sweatshirt|tunic|polo|jersey|robe|kimono|yukata|jumpsuit|coveralls|boiler suit|coat|jacket|cardigan|gambeson|doublet|samue|jinbei|gi top/.test(n)) f.add('underarms');
+    if(profile==='fabric'&&(['top','onepiece','outerwear','undergarmentTop'].includes(slot))&&!sleeveless&&/shirt|blouse|sweater|pullover|hoodie|sweatshirt|tunic|polo|jersey|robe|kimono|yukata|jumpsuit|coveralls|boiler suit|coat|jacket|cardigan|gambeson|doublet|samue|jinbei|gi top/.test(n)) f.add('underarms');
     if(f.has('underarms')&&!/short.sleeve|cap.sleeve|sleeveless|elbow.sleeve/.test(n)&&/long.sleeve|sweater|hoodie|sweatshirt|jacket|coat|cardigan|robe|kimono|yukata|doublet/.test(n)) f.add('elbows');
     if(soft&&slot==='bottom'&&!/shorts|breeches|skirt|skort|kilt|trunks|briefs|bikini|dhoti|lungi|sarong|longyi|chima|kain|iro |hakama/.test(n)&&/trousers|pants|jeans|slacks|leggings|tights|hose|chausses|jodhpurs|salwar|churidar/.test(n)) f.add('knees');
     if(soft&&/button|pajama shirt|oxford shirt|dress shirt|flannel shirt/.test(n)) f.add('buttons');
     if(soft&&/zip|zipper/.test(n)) f.add('zipper');
     if(profile==='fabric'&&/elastic|jogger|leggings|tights|sweatpants|sweatshorts/.test(n)) f.add('elastic');
+    if(foundation) {
+      if(!/adhesive/.test(n)&&/brief|boxer|trunks|jockstrap|undershorts|drawers|long johns|leggings|union suit|panties|thong|tap pants|slip shorts|bra\b|bralette|bodysuit|shaping|control slip/.test(n)) f.add('elastic');
+      if(/front-clasp bra/.test(n)) f.add('clasp');
+      if(/full-length thermal long johns|thermal drawers|thermal underwear leggings/.test(n)) f.add('knees');
+      if(/long-sleeved thermal underwear top/.test(n)) {f.add('underarms');f.add('elbows');}
+      if(/stockings|pantyhose|tights|socks|sock liners|garter belt/.test(n)) {f.add('elastic');f.add('stretch');}
+      if(/stockings|pantyhose|tights|socks|sock liners/.test(n)) f.add('knit');
+      if(/pantyhose|tights|thigh-high|over-the-knee/.test(n)) f.add('knees');
+      if(/garter belt|bra with.*clasp/.test(n)) f.add('clasp');
+      if(/underwear/.test(n)&&!/top|shirt/.test(n)) f.add('elastic');
+    }
     if(slot==='footwear'&&!/sock|tabi socks/.test(n)) f.add('soles');
     if(profile==='metal'&&/steel|iron|chainmail|mail |plate|cuirass|brigandine/.test(n)) f.add('ferrous');
     if(/spectacles|glasses|goggles/.test(n)) f.add('lenses');

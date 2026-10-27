@@ -1,23 +1,34 @@
 <!doctype html>
 <html lang="en">
-<head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>Character Wardrobe Picker</title><link rel="stylesheet" href="style.css"><script defer src="conditions.js"></script><script defer src="data.js"></script><script defer src="weapons.js"></script><script defer src="engine.js"></script><script defer src="app.js"></script></head>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#111514">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="Wardrobe Picker">
+<title>Character Wardrobe Picker</title>
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" href="icons/wardrobe.svg" type="image/svg+xml">
+<link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
+<link rel="stylesheet" href="style.css">
+<script defer src="conditions.js"></script><script defer src="data.js"></script><script defer src="weapons.js"></script><script defer src="weapon-conditions.js"></script><script defer src="engine.js"></script><script defer src="app.js"></script><script defer src="pwa.js"></script>
+</head>
 <body>
 <main>
-<header><h1>Character Wardrobe Picker</h1></header>
+<header><h1>Character Wardrobe Picker</h1><button id="installApp" type="button" aria-controls="installHelp" aria-expanded="false" hidden>Install app</button></header>
+<section id="installHelp" class="install-help" aria-label="Install app" hidden>
+<p id="installInstructions"></p>
+<button id="closeInstallHelp" type="button">Close</button>
+</section>
 <section class="controls" aria-label="Outfit settings">
 <div class="control-grid">
-<label>Clothing collection<select id="collection" aria-describedby="collectionHelp"><option value="all">All collections</option><option value="japanese">Japanese only</option></select></label>
+<label>Clothing collection<select id="collection"><option value="all">All collections</option><option value="japanese">Japanese only</option></select></label>
 <label>Occasion / setting<select id="occasion"><option value="casual">Casual / everyday</option><option value="work">Work / professional</option><option value="formal">Formal / evening</option><option value="outdoor">Outdoor / travel</option><option value="active">Activewear / sports</option><option value="sleep">Sleepwear / loungewear</option><option value="fantasy">Fantasy / armor</option></select></label>
 <label>Gender<select id="presentation"><option value="any">Any / mixed</option><option value="m">Male</option><option value="f">Female</option><option value="n">Neutral</option></select></label>
 <label>Picking mode<select id="mode"><option value="coordinated">Coordinated</option><option value="wildcard">Wildcard</option></select></label>
 <label>Outfit structure<select id="structure"><option value="auto">Auto</option><option value="separates">Separates</option><option value="onepiece">One-piece</option></select></label>
 </div>
-<div class="settings-line"><label class="probability">Auto one-piece chance <input id="onepieceChance" type="number" min="0" max="100" step="1"> %</label><label><input id="color" type="checkbox"> Color</label><label><input id="condition" type="checkbox"> Random condition on rolls</label></div>
-<p class="hint">Each item has a Condition menu. Choose a condition without changing the item or color; unlock it first if locked. Random conditions start on for future rolls; uncheck the option to turn them off.</p>
-<p class="hint" id="collectionHelp">Collection filters clothing and accessories, including in Wildcard. Hairstyles and Weapons keep their own filters.</p>
-<p class="hint" id="modeHelp">Coordinated draws from one occasion; it doesn’t guarantee a perfectly styled outfit.</p>
-<p class="hint">A one-piece replaces Top and Bottom; a one-piece None roll falls back to separates. Covered slots cannot be locked or rerolled.</p>
-<p class="hint">Settings affect future rolls. Locked results may come from earlier filters. Hairstyles follow the gender filter, with many shared styles. Neutral and Any / mixed include all hairstyles.</p>
+<div class="settings-line"><label class="probability">Auto one-piece chance <input id="onepieceChance" type="number" min="0" max="100" step="1"> %</label><label><input id="color" type="checkbox"> Color</label><label><input id="condition" type="checkbox"> Random condition on rolls</label><label>Underwear category<select id="undergarmentCategory"><option value="all">All categories</option><option value="modern">Modern</option><option value="comedy">Comedy</option></select></label></div>
 </section>
 <div class="toolbar"><div><button id="roll" class="primary">Roll outfit</button><button id="unlock">Unlock all</button></div><div><label><input id="omitEmpty" type="checkbox"> Omit empty slots</label><button id="copy">Copy outfit</button></div></div>
 <p id="status" role="status" aria-live="polite">Ready to roll.</p>

@@ -40,7 +40,7 @@ test('optional random conditions remain eligible throughout every slot and filte
  for(const collection of ['all','japanese']) for(const occasion of ['casual','work','formal','outdoor','active','sleep','fantasy']) for(const presentation of ['m','f','n','any']) {
    const s=P.initial();Object.assign(s.settings,{collection,occasion,presentation,condition:true,color:true});
    for(const [slot] of P.slots){s.chances[slot]=0;const r=P.pick(slot,s,()=>0.65);if(r.empty)continue;
-     if(['hairstyle','weapon'].includes(slot)){assert.equal(r.condition,null);assert.equal(r.text,r.baseText);}
+     if(slot==='hairstyle'){assert.equal(r.condition,null);assert.equal(r.text,r.baseText);}
      else assert.ok(P.conditionOptions(r).some(c=>c.id===r.condition),r.text);
      s.settings.condition=false;assert.equal(P.pick(slot,s,()=>0.65).condition,null);s.settings.condition=true;
    }
@@ -67,5 +67,29 @@ test('random conditions default on, migrate old saves once, and respect later op
  restored.settings.condition=false;
  const optedOut=P.restore(JSON.stringify(restored));assert.equal(optedOut.settings.condition,false);
  assert.equal(P.roll(optedOut,'top',()=>0.3).state.results.top.condition,null);
+});
+test('undergarment conditions follow body contact, sleeves, elastic, clasps, and leg coverage',()=>{
+ for(const i of D.items.filter(i=>['undergarmentTop','undergarmentBottom','hosiery'].includes(i.slot))) {
+   assert.equal(i.conditionProfile,'fabric');assert.ok(i.conditionFeatures.includes('body_contact'),i.name);
+   assert.ok(ids(i.name).includes('sweat_stained'),i.name);assert.ok(!ids(i.name).includes('worn_soles'),i.name);
+ }
+ assert.ok(ids('Crew-neck undershirt').includes('pit_stains'));
+ assert.ok(!ids('Sleeveless ribbed undershirt').includes('pit_stains'));
+ assert.ok(!ids('Classic fly-front briefs').includes('pit_stains'));
+ assert.ok(!ids('Underwired balconette bra').includes('pit_stains'));
+ assert.ok(ids('Low-rise briefs').includes('failed_elastic'));
+ assert.ok(!ids('Adhesive backless bra').includes('failed_elastic'));
+ assert.ok(ids('Front-clasp bra').includes('broken_clasp'));assert.ok(!ids('Pull-on bralette').includes('broken_clasp'));
+ assert.ok(ids('Full-length thermal long johns').includes('worn_knees'));
+ assert.ok(!ids('Three-quarter thermal long johns').includes('worn_knees'));
+ assert.ok(!ids('Short-leg boxer briefs').includes('worn_knees'));
+ for(const name of ['Sheer control-top pantyhose','Footless layering tights','Back-seamed stockings','Ankle-length liner socks']) {
+   assert.ok(ids(name).includes('failed_elastic'),name);assert.ok(ids(name).includes('stretched'),name);
+   assert.ok(!ids(name).includes('pit_stains'),name);
+ }
+ assert.ok(ids('Sheer control-top pantyhose').includes('worn_knees'));
+ assert.ok(!ids('Ankle-length liner socks').includes('worn_knees'));
+ assert.ok(ids('Suspender stockings with garter belt').includes('broken_clasp'));
+ assert.ok(ids('Bra with a squeaky duck-shaped clasp').includes('broken_clasp'));
 });
 console.log(`${checks} condition checks passed (${C.catalog.length} condition types).`);

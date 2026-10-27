@@ -321,6 +321,55 @@
   add('bottom','fantasy','shared','Drawstring linen breeches|Button-fall breeches|Knee-buckled breeches|Venetian breeches|Trunk hose|Pumpkin breeches|Panes-and-puffs breeches|Pluderhose|Joined wool hose|Footed wool chausses|Laced leather chausses|Padded riding breeches|Quilted winter breeches|Fur-lined hunting trousers|Gusseted mercenary trousers|Tie-calf ranger trousers|High-waisted sailor slops|Canvas deck breeches|Split-front court trousers|Wide-legged caravan trousers|Wrapped desert trousers|Layered nomad skirt|Pleated traveling kilt|Laced riding culottes|Chainmail chausses over padded trousers|Leather trousers with riveted thigh plates|Lamellar-armored riding trousers|Quilted trousers with steel knee guards');
   add('bottom','fantasy','f n','Linen peasant skirt|Gathered wool overskirt with underskirt|Gored court skirt|Split-front overskirt with full underskirt|Paneled brocade court skirt|Bustled traveling skirt|Laced-waist riding skirt|Layered handkerchief skirt|Scalloped heraldic skirt|Split-panel ranger skirt over leggings');
 
+  // Modern undergarments. Append-only so existing wardrobe IDs stay stable.
+  // Foundation layers work across occasions. Neutral includes both catalogs.
+  // Men's briefs: cuts, openings, and support constructions.
+  add('undergarments','all','m n','Classic fly-front briefs|Low-rise briefs|Mid-rise contour briefs|High-rise full-cut briefs|Side-opening adaptive briefs|Side-vent athletic briefs|Open-side briefs|Y-front briefs|Horizontal-fly briefs|Support-pouch briefs');
+  // Men's boxers, boxer briefs, and trunks.
+  add('undergarments','all','m n','Button-fly woven boxers|Overlap-fly woven boxers|Side-slit boxer shorts|Pleated-front boxer shorts|Stretch-knit boxers|Seamless boxer shorts|Loose-cut long-leg boxers|Short-leg boxer briefs|Mid-thigh boxer briefs|Long-leg boxer briefs|Flyless boxer briefs|Contour-seam boxer briefs|No-roll waistband boxer briefs|Anti-chafing panel boxer briefs|Mesh-panel athletic boxer briefs|Low-rise underwear trunks|Square-cut underwear trunks|Seamless underwear trunks|Pouch-front underwear trunks|Double-layer support trunks');
+  // Men's athletic support, thermal layers, undershirts, and sets.
+  add('undergarments','all','m n','Athletic jockstrap|Wide-band support jockstrap|Compression undershorts|Padded cycling undershorts|Protective-cup support briefs|Flatlock-seam thermal drawers|Full-length thermal long johns|Three-quarter thermal long johns|Gusseted thermal underwear leggings|Snap-front thermal union suit|Crew-neck undershirt|V-neck undershirt|Deep-V invisible undershirt|Sleeveless ribbed undershirt|Muscle-cut undershirt|Longline stay-tucked undershirt|Sweat-guard undershirt|Long-sleeved thermal undershirt|Briefs and crew-neck undershirt set|Boxer briefs and tank undershirt set');
+  // Women's underwear bottoms and functional constructions.
+  add('undergarments','all','f n','Full-coverage underwear briefs|High-waisted underwear briefs|French-cut underwear briefs|Low-rise bikini panties|String-side bikini panties|Hipster panties|Seamless hipster panties|Boyshort panties|Long-leg boyshort panties|Cheeky-cut panties|Brazilian-cut panties|Thong underwear|High-waisted thong underwear|Tanga panties|Tap pants underwear|High-waisted control briefs|Anti-chafing slip shorts|Leakproof period briefs|Absorbent postpartum briefs|Side-opening adaptive panties');
+  // Women's bras and bralettes, distinct from outerwear training tops.
+  add('undergarments','all','f n','Underwired balconette bra|Demi-cup bra|Full-cup support bra|Plunge bra|Molded-cup T-shirt bra|Unlined seamed-cup bra|Wireless triangle bra|Pull-on bralette|Longline bralette|Strapless support bra|Convertible-strap bra|Racerback everyday bra|Front-clasp bra|Nursing bra|Pocketed prosthesis bra|High-impact encapsulation bra|Low-impact crossover sports bra|Adhesive backless bra|Wide-band minimizer bra|Soft-cup sleep bralette');
+  // Women's slips, shapewear, thermal layers, and sets.
+  add('undergarments','all','f n','Full slip underdress|Half slip underskirt|Shelf-bra layering camisole|Seamless shaping bodysuit|Open-bust shaping bodysuit|Mid-thigh shaping shorts|Waist-cinching control slip|Long-sleeved thermal underwear top|Bra and bikini underwear set|Bralette and boyshort underwear set');
+
+  // Keep the original 100 alternatives in the Modern category. New entries
+  // remain append-only, preserving every existing saved wardrobe ID.
+  for (const item of items) if (item.slot === 'undergarments') item.undergarmentCategory = 'modern';
+  const addUndergarments = (category, presentations, names) => {
+    const start = items.length;
+    add('undergarments', 'all', presentations, names);
+    for (const item of items.slice(start)) item.undergarmentCategory = category;
+  };
+
+  // Hosiery: 20 feminine-associated styles and five shared alternatives.
+  addUndergarments('hosiery','f n','Sheer control-top pantyhose|Opaque microfiber tights|Footless layering tights|Convertible dance tights|Stirrup hosiery tights|Open-toe hosiery tights|Seamless-waist tights|Maternity support pantyhose|Back-seamed stockings|Fully fashioned stockings|Reinforced-heel stockings|Reinforced-toe stockings|Lace-top hold-up stockings|Silicone-band stay-up stockings|Suspender stockings with garter belt|Thigh-high compression stockings|Over-the-knee ribbed stockings|Fishnet pantyhose|Diamond-knit fashion tights|Open-crotch suspender tights');
+  addUndergarments('hosiery','shared','Ankle-length liner socks|Calf-length ribbed dress socks|Over-the-calf support socks|Graduated compression knee-high socks|Seamless toe-sock liners');
+
+  // Comedy: 20 shared alternatives plus five feminine-associated designs.
+  addUndergarments('comedy','shared','Emergency backup underwear|Superhero briefs with a tiny cape|Underwear labeled "FRONT" on both sides|Boxer shorts with a squeaky waistband|Boxer briefs with a fake utility belt|Thermal underwear with a rear escape hatch|Boxer shorts with an inflatable seat cushion|Breakaway underwear with an instruction booklet|Briefs with a novelty censored panel|Underwear with a "Do not microwave" care label|Boxer shorts with an outrageously long drawstring|Underwear with a built-in whoopee cushion|Underwear with a detachable modesty curtain|Briefs with an emergency snack pocket|Boxer shorts covered in fake sponsor patches|Underwear labeled "Property of the final boss"|Underwear with a counterfeit royal crest|Boxer shorts with a novelty trapdoor|Underwear with an oversized award ribbon|Briefs with a theatrical foam codpiece');
+  addUndergarments('comedy','f n','Bra with a squeaky duck-shaped clasp|Bra with detachable emergency confetti pouches|Bralette labeled "Side quest equipment"|Panties with a tiny ornamental bustle|Garter belt with miniature trophy charms');
+
+  // Split foundation layers without changing their saved IDs. Full sets and
+  // closed-bust full-body pieces live in Top and include the underwear bottom.
+  const fullUnderwear = new Set([
+    'Snap-front thermal union suit', 'Briefs and crew-neck undershirt set',
+    'Boxer briefs and tank undershirt set', 'Full slip underdress',
+    'Seamless shaping bodysuit', 'Bra and bikini underwear set',
+    'Bralette and boyshort underwear set'
+  ]);
+  for (const item of items) if (item.slot === 'undergarments') {
+    if (item.name === 'Underwear labeled "Property of the final boss"') item.name = 'Undershirt labeled "Property of the final boss"';
+    if (item.name === 'Underwear with an oversized award ribbon') item.name = 'Undershirt with an oversized award ribbon';
+    if (item.undergarmentCategory === 'hosiery') item.slot = 'hosiery';
+    else if (fullUnderwear.has(item.name) || /\bbra\b|bralette|undershirt|camisole|long-sleeved thermal underwear top/i.test(item.name)) item.slot = 'undergarmentTop';
+    else item.slot = 'undergarmentBottom';
+    if (fullUnderwear.has(item.name)) item.covers = ['undergarmentBottom'];
+  }
+
   // Conditions are metadata on each item, independent of its garment name.
   const conditionData = root.ConditionData || require('./conditions.js');
   for (const item of items) Object.assign(item, conditionData.classify(item));

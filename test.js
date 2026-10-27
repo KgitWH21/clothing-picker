@@ -202,4 +202,44 @@ test('expanded bottoms cover all occasions and Japanese selections without outfi
  assert.ok(!P.pool('bottom',settings).some(i=>i.name.startsWith('Salwar')));
  assert.equal(P.pool('bottom',{...settings,collection:'all'}).length,bottoms.length);
 });
+test('undergarment categories retain 100 modern choices and add 25 hosiery and 25 comedy choices',()=>{
+ const layers=['undergarmentTop','undergarmentBottom','hosiery'];
+ const underwear=D.items.filter(i=>layers.includes(i.slot));assert.equal(underwear.length,150);
+ for(const [category,count] of [['modern',100],['hosiery',25],['comedy',25]]) assert.equal(underwear.filter(i=>i.undergarmentCategory===category).length,count);
+ const counts={all:{undergarmentTop:[13,31,42,42],undergarmentBottom:[57,44,83,83]},modern:{undergarmentTop:[11,26,37,37],undergarmentBottom:[39,24,63,63]},comedy:{undergarmentTop:[2,5,5,5],undergarmentBottom:[18,20,20,20]}};
+ for(const mode of ['coordinated','wildcard']) for(const occasion of ['casual','work','formal','outdoor','active','sleep','fantasy']) {
+   for(const [undergarmentCategory,bySlot] of Object.entries(counts)) for(const [index,presentation] of ['m','f','n','any'].entries()) for(const slot of layers) {
+     const settings={...P.initial().settings,mode,occasion,presentation,undergarmentCategory};
+     const pool=P.pool(slot,settings);assert.equal(pool.length,slot==='hosiery'?[5,25,25,25][index]:bySlot[slot][index]);
+     assert.ok(pool.every(i=>presentation==='any'||i.presentations.includes('shared')||i.presentations.includes(presentation)));
+     assert.ok(pool.every(i=>slot==='hosiery'||undergarmentCategory==='all'||i.undergarmentCategory===undergarmentCategory));
+     assert.equal(P.pool(slot,{...settings,collection:'japanese'}).length,0);
+   }
+ }
+ const selected=P.initial();selected.settings.undergarmentCategory='comedy';
+ assert.equal(P.restore(JSON.stringify(selected)).settings.undergarmentCategory,'comedy');
+ assert.deepEqual(P.pool('top',selected.settings),P.pool('top',{...selected.settings,undergarmentCategory:'modern'}));
+ delete selected.settings.undergarmentCategory;assert.equal(P.restore(JSON.stringify(selected)).settings.undergarmentCategory,'all');
+ selected.settings.undergarmentCategory='unknown';assert.equal(P.restore(JSON.stringify(selected)).settings.undergarmentCategory,'all');
+});
+test('underwear separates and hosiery stay independent across outfits, locks, conditions, copying, and saves',()=>{
+ let s=P.initial();
+ for(const slot of ['undergarmentTop','undergarmentBottom','hosiery']) {
+   assert.equal(s.chances[slot],10);
+   assert.equal(P.pick(slot,s,()=>0.099).text,'None');assert.equal(P.pick(slot,s,()=>0.1).empty,false);
+ }
+ s.settings.structure='onepiece';s=P.roll(s,null,fixed).state;
+ assert.equal(s.results.top.covered,true);assert.equal(s.results.bottom.covered,true);
+ for(const slot of ['undergarmentTop','undergarmentBottom','hosiery']) assert.equal(s.results[slot].empty,false);
+ s=P.setCondition(s,'undergarmentBottom','brand_new').state;s.locks.undergarmentBottom=true;
+ const locked=s.results.undergarmentBottom;s.settings.presentation='f';s.settings.structure='separates';s=P.roll(s,null,fixed).state;
+ assert.deepEqual(s.results.undergarmentBottom,locked);assert.ok(P.roll(s,'undergarmentBottom',fixed).error);
+ assert.ok(P.copyText(s).includes('Undergarment bottom: '+locked.text));
+ const saved=P.restore(JSON.stringify(s));assert.deepEqual(saved.results.undergarmentBottom,locked);assert.equal(saved.locks.undergarmentBottom,true);
+ s.locks.undergarmentBottom=false;s=P.roll(s,'undergarmentBottom',fixed).state;
+ assert.ok(D.items.find(i=>i.id===s.results.undergarmentBottom.id).presentations.some(p=>['f','shared'].includes(p)));
+ s.chances.undergarmentBottom=100;s=P.roll(s,'undergarmentBottom',fixed).state;assert.equal(s.results.undergarmentBottom.text,'None');
+ s.chances.undergarmentBottom=0;s.settings.collection='japanese';s=P.roll(s,'undergarmentBottom',fixed).state;
+ assert.equal(s.results.undergarmentBottom.empty,true);assert.ok(s.results.undergarmentBottom.reason);
+});
 console.log(`${checks} behavior checks passed.`);
