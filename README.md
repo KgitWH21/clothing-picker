@@ -119,3 +119,17 @@ Foundation-layer tests cover independent bra/bottom/hosiery rolls, every full se
 Weapon-condition checks verify all 125 distinct statuses are reachable and separate from clothing, compatibility across all 94 entries, manual edits and locks, random rolls across every mode/era, copied explanations, saved results, and migration of the higher default roll chance.
 
 PWA checks cover icon dimensions, installation prompts and fallbacks, standalone mode, insecure URLs, offline assets, and cache isolation between URL scopes. Chromium browser checks also verified desktop and phone layouts, the manifest, offline reloads and rolls, and saved results at both the site root and a subdirectory. iPhone installation guidance was checked with an iPhone user agent; native phone installation, browser clipboard permissions, and screen-reader interaction still require device checks.
+
+## Prefilled links from Character Maker
+
+Open `?occasion=work&presentation=m` to preselect the native Occasion / setting and Gender
+controls. Occasions: `casual`, `work`, `formal`, `outdoor`, `active`, `sleep`, `fantasy`.
+Gender presentation: `m` (Male), `f` (Female), `n` (Neutral), or `any` (Any / mixed).
+Only these allowlisted values are applied; other parameters are ignored. Existing results,
+locks, chances, and unrelated settings remain intact. Roll outfit applies the new filters
+to unlocked details; an empty wardrobe generates its first outfit with the incoming filters.
+No character names, notes, or other character data are requested.
+
+`prefill.js` applies the two settings before initial generation and control rendering.
+Run `node test-prefill.js` to verify the link contract and saved-outfit preservation.
+The v9 service worker includes the new script.

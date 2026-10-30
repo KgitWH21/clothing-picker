@@ -17,10 +17,10 @@ function app({failStorage=false, clipboard=false, saved=null}={}){
  const document={getElementById(id){return elements[id]||=(new Element());},createElement(){return new Element();},createTextNode(text){return text;}};
  for(const id of ['color','condition','omitEmpty','weapons']) document.getElementById(id).type='checkbox';
  document.getElementById('onepieceChance').type='number';
- const context=vm.createContext({document, navigator:{clipboard:clipboard?{async writeText(t){writes.push(t);}}:undefined},localStorage:{getItem(){if(failStorage)throw Error();return stored;},setItem(k,v){if(failStorage)throw Error();stored=v;}},console});
+ const context=vm.createContext({document, navigator:{clipboard:clipboard?{async writeText(t){writes.push(t);}}:undefined},URLSearchParams,localStorage:{getItem(){if(failStorage)throw Error();return stored;},setItem(k,v){if(failStorage)throw Error();stored=v;}},console});
  // Keep initial Auto structure in separates so the top-lock scenario is stable.
  vm.runInContext('Math.random = () => 0.3;',context);
- for(const file of ['conditions.js','data.js','weapons.js','weapon-conditions.js','engine.js','app.js']) vm.runInContext(readFileSync(file,'utf8'),context);
+ for(const file of ['conditions.js','data.js','weapons.js','weapon-conditions.js','engine.js','prefill.js','app.js']) vm.runInContext(readFileSync(file,'utf8'),context);
  return {elements,writes,stored:()=>stored};
 }
 (async()=>{

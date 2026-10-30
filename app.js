@@ -3,6 +3,8 @@
   const $=id=>document.getElementById(id);
   let state=P.initial(), storage=true;
   try {state=P.restore(localStorage.getItem(key));} catch (_) {storage=false;}
+  const incoming=PickerPrefill.apply(state,globalThis.location?.search||'');
+  state=incoming.state;
   if(!Object.keys(state.results).length) state=P.roll(state).state;
   else state=P.fillFoundation(state);
   const rows={};
@@ -99,4 +101,5 @@
   });
   $('collectionCount').textContent=`${WardrobeData.items.length} base details · ${WeaponData.physical.length+WeaponData.metaphorical.length} weapons & advantages`;
   render();
+  if(incoming.applied.length) notify('Linked occasion / gender applied. Roll outfit to refresh unlocked details.');
 })();
